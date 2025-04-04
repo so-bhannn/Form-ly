@@ -51,16 +51,14 @@ class FormSerializer(serializers.ModelSerializer):
                     
                     options_data=questions_data.pop('options',[])
 
-                    question=Question.objects.create(form= form, order=index[
-                        
-                    ],**question_data)
+                    question=Question.objects.create(form= form, order=index,**question_data)
 
                     if options_data:
 
                         Option.objects.bulk_create([
-                            Option(question=question, **option_data for option_data in options_data)
+                            Option(question=question, **option_data) for option_data in options_data
                         ])
+            return form
+    
         except Exception as e:
             raise e
-        
-        return form
