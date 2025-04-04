@@ -4,7 +4,14 @@ from .models import Form
 from .serializers import FormSerializer
 
 
-class CreateFormView(ModelViewSet):
-    queryset=Form.objects.all()
+class FormViewSet(ModelViewSet):
     serializer_class=FormSerializer
     permission_classes=[IsAuthenticated]
+
+    def get_queryset(self):
+        user=self.request.user
+        if user.is_authenticated:
+            queryset=Form.objects.filter(owner=user)
+    
+    def perform_create(self, serializer):
+        serializer.save(creator=self.request.user)
