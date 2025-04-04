@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import BaseUserManager
 from forms import settings
 import uuid
 
@@ -13,7 +14,6 @@ class Form(models.Model):
     title = models.CharField(max_length=100, blank=False)
     description = models.TextField(blank=True)
     form_id = models.UUIDField(unique=True, default=uuid.uuid4, editable=False, primary_key=True)
-
 
     REQUIRED_FIELDS = ['owner', 'title']
 
@@ -42,6 +42,8 @@ class Question(models.Model):
 
     class Meta:
         ordering = ['order', 'id']
+
+    REQUIRED_FIELDS=['form', 'text', 'question_type', 'is_required']
 
 class Option(models.Model):
     question = models.ForeignKey(

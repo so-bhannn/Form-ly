@@ -1,5 +1,5 @@
 """
-URL configuration for forms project.
+URL configuration for formly project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.0/topics/http/urls/
@@ -15,11 +15,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from create import views
+from django.urls import path, include
+from forms import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',views.index,name='index'),
-    path('create/',views.create_form,name='create'),
+    path('forms/',include('forms.url')),
 ]
