@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager
-from forms import settings
+from django.conf import settings
 import uuid
 
 # Create your models here.
