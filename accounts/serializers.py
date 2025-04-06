@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model,authenticate
 
 User= get_user_model()
 
@@ -40,3 +40,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         user=User.objects.create(**validated_data)
         return user
+    
+class LoginSerializer(serializers.Serializer):
+    email= serializers.CharField(write_only=True)
+    password= serializers.CharField(write_only=True)
