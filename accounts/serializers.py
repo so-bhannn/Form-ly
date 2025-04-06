@@ -49,3 +49,19 @@ class RegisterSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     email= serializers.CharField(write_only=True)
     password= serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        email = attrs.get('email')
+        password = attrs.get('password')
+
+        if email and password:
+            user = authenticate(request=self.context.request, email=email, password=password)
+
+            if not user:
+                raise serializers.ValidationError('Error authenticating the user.', code='authorization')
+        
+        else:
+            raise serializers.ValidationError('Correct data not provided.', code='authorization')
+        
+        attrs['user']=user
+        return attrs
