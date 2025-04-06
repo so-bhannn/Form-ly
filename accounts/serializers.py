@@ -30,6 +30,11 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("An account with the same email exists.")
         return email
     
+    def validate_username(self,username):
+        if User.objects.filter(username__iexact=username).exists():
+            raise serializers.ValidationError("An account with the same username exists.")
+        return username
+    
     def validate(self, attrs):
         if attrs['password']!=attrs['password2']:
             raise serializers.ValidationError("Both the passwords must match.")
