@@ -4,6 +4,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.authtoken.models import Token
 
 from .serializers import RegisterSerializer,UserSerializer,LoginSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
 
 class RegisterView(GenericAPIView):
     serializer_class=RegisterSerializer
@@ -14,11 +15,14 @@ class RegisterView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
 
-        token,created = Token.objects.get_or_create(user=user)
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
 
         return Response({
             'user':UserSerializer(user, context=self.get_serializer_context()).data,
-            'token': token.key,
+            'refresh': refresh_token,
+            'access': access_token,
             'message': 'User registered successfully'
         },status=status.HTTP_201_CREATED)
     
@@ -27,15 +31,18 @@ class LoginView(GenericAPIView):
     permission_classes=[permissions.AllowAny]
 
     def post(self,request,*args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
-
-        token,_=Token.objects.get_or_create(user=user)
+        
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
 
         if user:
             return Response({
                 'user': UserSerializer(user, context=self.get_serializer_context()).data,
-                'token': token.key,
+                'refresh': refresh_token,
+                'access': access_token,
                 'message': 'Logged in successfully'
             },status=status.HTTP_200_OK)
