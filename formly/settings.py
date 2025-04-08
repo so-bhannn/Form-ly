@@ -107,8 +107,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTHENTICATION_BACKENDS=[
-    'django.contrib.auth.backends.ModelBackend',
     'accounts.backends.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 
@@ -145,6 +145,6 @@ REST_FRAMEWORK={
 }
 
 SIMPLE_JWT={
-    'ACCESS_TOKEN_LIFETIME':timedelta(minutes=30),
+    'ACCESS_TOKEN_LIFETIME':timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=15)
 }

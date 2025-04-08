@@ -25,14 +25,12 @@ class QuestionSerializer(serializers.ModelSerializer):
             QuestionType.DROPDOWN
         ]
 
-        if question_type in option_base_types:
-            if not options:
-                raise serializers.ValidationError(f"Options are required for {QuestionType(question_type).label}")
-        else:
-            return data
+        if question_type in option_base_types and not options:
+            raise serializers.ValidationError(f"Options are required for {QuestionType(question_type).label}")
+        return data
         
 class FormSerializer(serializers.ModelSerializer):
-
+    owner =serializers.ReadOnlyField(source='owner.username')
     questions= QuestionSerializer(many=True, required=True)
 
     class Meta:
@@ -48,8 +46,8 @@ class FormSerializer(serializers.ModelSerializer):
                 form=Form.objects.create(**validated_data)
 
                 for index,question_data in enumerate(questions_data):
-                    
-                    options_data=questions_data.pop('options',[])
+                    print(question_data)
+                    options_data=question_data.pop('options',[])
 
                     question=Question.objects.create(form= form, order=index,**question_data)
 
