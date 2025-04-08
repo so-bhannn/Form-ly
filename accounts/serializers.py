@@ -42,8 +42,11 @@ class RegisterSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         validated_data.pop('password2')
+        password=validated_data.pop('password')
 
-        user=User.objects.create(**validated_data)
+        user=User(**validated_data)
+        user.set_password(password)
+        user.save()
         return user
     
 class LoginSerializer(serializers.Serializer):
@@ -55,7 +58,7 @@ class LoginSerializer(serializers.Serializer):
         password = attrs.get('password')
 
         if email and password:
-            user = authenticate(request=self.context.request, email=email, password=password)
+            user = authenticate(request=self.context.get('request'), username=email, password=password)
 
             if not user:
                 raise serializers.ValidationError('Error authenticating the user.', code='authorization')
