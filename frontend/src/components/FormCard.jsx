@@ -32,7 +32,7 @@ const FormCard = ({
     }
 
     return(
-        <div className="flex flex-col h-60 w-96 lg:w-5xl justify-self-center justify-center rounded-lg outline-1 outline-gray-200 shadow-sm p-8 gap-2">
+        <div className="flex flex-col h-60 w-96 lg:w-5xl justify-center rounded-lg outline-1 outline-gray-200 shadow-sm p-8 gap-2">
             <div className="flex flex-col">
                 <div className="text-3xl text-black/80 font-bold">
                     {title}
