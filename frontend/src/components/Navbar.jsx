@@ -7,7 +7,7 @@ const Navbar=()=>{
     const pathname = location.pathname;
 
     return(
-        <div className="flex w-full min-h-16 justify-between items-center px-15 border-b-1 border-gray-200">
+        <div className="flex w-full min-h-16 justify-between items-center px-15  bg-white border-b-1 border-gray-200 sticky top-0 z-10">
             <a href="/" className="flex gap-1 text-black/80">
                 <i className='bx bx-file text-3xl'></i>
                 <div className="font-bricolage font-bold text-2xl">Formly</div>

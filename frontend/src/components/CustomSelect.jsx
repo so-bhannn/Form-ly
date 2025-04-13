@@ -35,7 +35,7 @@ const CustomSelect = ({onChange, options, defaultValue, label})=>{
       </button>
 
       {isOpen && (
-        <div className='absolute z-10 w-full rounded-md border border-gray-300'>
+        <div className='absolute z-10 w-full rounded-md bg-white border border-gray-300'>
           <ul className='py-1 max-h-50 overflow-auto'>
             {options.map((option)=>{
               return(
