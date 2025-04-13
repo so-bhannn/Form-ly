@@ -2,6 +2,23 @@ import { FormCard } from "../components"
 import { DashboardLayout } from "../layouts"
 
 const Dashboard = ()=>{
+
+    const formDetails=[{ id: "",
+            title: "Form A",
+            description: `Lorem ipsum dolor sit amet,consectetur adipisicing elit. Dignissimos vitae commodi fugit in porro,assumenda adipisci repellat ea natus dicta voluptate tempora. Odit et saepe laborum ratione esse,eos facere!` ,
+            lastUpdated: "3",
+            responses: "15" },
+        { id: "", title: "Form Q", description: "", lastUpdated: "1", responses: 5 },
+        { id: "", title: "Form U", description: "", lastUpdated: "4", responses: 12 },
+        { id: "", title: "Form P", description: "", lastUpdated: "14", responses: 20 },
+        { id: "", title: "Form H", description: "", lastUpdated: "14", responses: 20 },
+        { id: "", title: "Form D", description: "", lastUpdated: "14", responses: 20 },
+        ]
+
+        const sortedForm=[...formDetails].sort((a,b)=>(
+            a.lastUpdated-b.lastUpdated
+        ))
+
     return(
         <DashboardLayout
             pageTitle='Dashboard'
@@ -35,12 +52,21 @@ const Dashboard = ()=>{
             <span className="w-full text-2xl font-bold py-5">
                 Recent Forms
             </span>
-            <FormCard
-                title="My Form"
-                description="This is my first form on Formly. I'm very much excited after using this wonderful application. Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus modi qui sit, quod fuga incidunt ex aut perspiciatis corrupti, rem natus blanditiis accusamus officiis veritatis eos! Aut sapiente inventore ducimus? Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus modi qui sit, quod fuga incidunt ex aut perspiciatis corrupti, rem natus blanditiis accusamus officiis veritatis eos! Aut sapiente inventore ducimus?"
-                responses={10}
-                lastUpdated={3}
-            />
+            <div className="grid grid-cols-2 gap-6 w-full">
+                {formDetails.length && (
+                    sortedForm.map((formDetail)=>{
+                        return(
+                            <FormCard
+                                title={formDetail.title}
+                                description={formDetail.description}
+                                lastUpdated={formDetail.lastUpdated}
+                                responses={formDetail.responses}
+                                formID={formDetail.id}
+                            />
+                        )
+                    })
+                )}
+            </div>
         </DashboardLayout>
     )
 }
