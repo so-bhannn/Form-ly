@@ -1,6 +1,7 @@
 import { 
     FormCard,
     CustomSelect,
+    Button,
  } from "../components";
 import {
     DashboardLayout
@@ -40,9 +41,14 @@ const AllForms = () => {
     };
 
     return(
-        <DashboardLayout
-            pageTitle='My Forms'
-        >
+        <DashboardLayout>
+            <div className="flex flex-wrap justify-between w-full pb-3.5">
+                <h1 className="text-4xl font-bold mb-2 md:mb-0">My Forms</h1>
+                <Button
+                    icon='bx bx-plus'
+                    content='Create Form'
+                />
+            </div>
             <div className="w-full flex justify-between items-center mb-6">
                 <CustomSelect
                     options={sortOptions}

@@ -1,4 +1,7 @@
-import { FormCard } from "../components"
+import { 
+    FormCard,
+    Button,
+ } from "../components"
 import { DashboardLayout } from "../layouts"
 
 const Dashboard = ()=>{
@@ -20,9 +23,14 @@ const Dashboard = ()=>{
         ))
 
     return(
-        <DashboardLayout
-            pageTitle='Dashboard'
-        >
+        <DashboardLayout>
+            <div className="flex justify-between flex-wrap w-full pb-3.5">
+                <h1 className="text-4xl font-bold mb-2 md:mb-0">Dashboard</h1>
+                <Button
+                    icon='bx bx-plus'
+                    content='Create Form'
+                />
+                </div>
             <div className="grid md:grid-cols-3 gap-6 w-full pb-3">
                 <div className="rounded-lg outline-1 outline-gray-200 shadow-sm p-6">
                     <div className="w-full pb-2 space-y-1.5">
