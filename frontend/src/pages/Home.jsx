@@ -7,7 +7,9 @@ const Home = ()=>{
 
     return(
     <div className='flex flex-col w-full h-screen'>
+        <div className='sticky top-0 z-10'>
         <Navbar/>
+        </div>
         <div className='px-10 md:p-0'>
             <div className="flex flex-wrap items-center lg:flex-nowrap md:px-10 px-0 py-5">
                 <div className='md:mr-10'>
