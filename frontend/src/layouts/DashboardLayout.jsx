@@ -5,7 +5,7 @@ import {
 
 import { useLocation } from "react-router-dom";
 
-const DashboardLayout = ({pageTitle, children})=>{
+const DashboardLayout = ({children})=>{
     const location = useLocation();
     const pathname = location.pathname;
 
@@ -30,13 +30,6 @@ const DashboardLayout = ({pageTitle, children})=>{
                     </div>
                 </aside>
                 <div className="sm:ml-70 flex flex-col items-center w-full p-5 box-border">
-                    <div className="flex justify-between flex-wrap w-full pb-3.5">
-                        <h1 className="text-4xl font-bold mb-2 md:mb-0">{pageTitle}</h1>
-                        <Button
-                            icon='bx bx-plus'
-                            content='Create Form'
-                        />
-                    </div>
                 {children}
                 </div>
             </div>
