@@ -44,7 +44,7 @@ const FormCard = ({
             </div>
             <div className='text-sm text-black/50 py-2'>{`${responses} Responses`}</div>
             <div className='flex gap-5'>
-                <a href={formID ? `formLink/edit/${formID}`:''}><Button content='Edit' black={false} ></Button></a>
+                <a href={`edit/`}><Button content='Edit' black={false} ></Button></a>
                 <a href={formID ? `formLink/responses/${formID}`:''}><Button content='View Responses'></Button></a>
             </div>
         </div>
