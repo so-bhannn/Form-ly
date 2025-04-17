@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 
-const CustomSelect = ({onChange, options, defaultValue, label})=>{
+const CustomSelect = ({onChange, options, defaultValue, label, icon})=>{
   const [isOpen, setIsOpen] = useState(false)
   const [selectedOption, setSelectedOption] = useState(defaultValue||options[0])
   const dropdownRef = useRef(null)
@@ -26,7 +26,7 @@ const CustomSelect = ({onChange, options, defaultValue, label})=>{
 
   return(
     <div className='inline-block relative w-44 mr-6' ref={dropdownRef}>
-      {label && <span className='flex items-center p-1 gap-1 text-sm text-black/60'><i className='bx bx-sort'></i>{label}</span> }
+      {label && <span className='flex items-center p-1 gap-1 text-sm text-black/60'>{ icon && <i className={`bx bx-${icon}`}></i>}{label}</span> }
       <button 
       onClick={()=>setIsOpen(!isOpen)}
       className='flex items-center justify-between w-full border border-gray-300 rounded-md p-2 hover:cursor-pointer focus:ring-1 focus:ring-black/80 '>
