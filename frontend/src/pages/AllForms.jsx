@@ -55,6 +55,7 @@ const AllForms = () => {
                     defaultValue={sortOptions[0]}
                     onChange={handleSortChange}
                     label="Sort by"
+                    icon='sort'
                 />
             </div>
             
