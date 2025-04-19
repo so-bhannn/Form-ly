@@ -2,7 +2,8 @@ import './App.css'
 import {
   Home,
   Dashboard,
-  AllForms
+  AllForms,
+  FormBuilder,
 } from './pages'
 
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
@@ -17,6 +18,7 @@ function App() {
           <Route path='/' element={<Home/>} />
           <Route path='/dashboard' element={<Dashboard/>} />
           <Route path='/forms' element={<AllForms/>} />
+          <Route path='/edit' element={<FormBuilder/>}></Route>
         </Routes>
       </div>
     </Router>
