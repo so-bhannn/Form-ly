@@ -27,7 +27,9 @@ const CustomSelect = ({onChange, options, defaultValue, label, icon})=>{
   return(
     <div className='inline-block relative w-44 mr-6' ref={dropdownRef}>
       {label && <span className='flex items-center p-1 gap-1 text-sm text-black/60'>{ icon && <i className={`bx bx-${icon}`}></i>}{label}</span> }
-      <button 
+      <button
+      aria-haspopup="listbox"
+      aria-expanded={isOpen}
       onClick={()=>setIsOpen(!isOpen)}
       className='flex items-center justify-between w-full border border-gray-300 rounded-md p-2 hover:cursor-pointer focus:ring-1 focus:ring-black/80 '>
         <span className='text-sm'>{selectedOption.label}</span>
