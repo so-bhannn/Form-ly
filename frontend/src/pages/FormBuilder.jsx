@@ -8,7 +8,7 @@ import { DashboardLayout } from '../layouts'
 export default function FormBuilder(){
 
     const[questions,setQuestions]=useState([
-        {id:uuidv4(), text:"", question_type:"DD", is_required:"", order:1, options:[]},
+        {id:uuidv4(), text:"", question_type:"SA", is_required:"", order:1, options:[]},
     ])
 
     const addQuestion=()=>{
@@ -26,6 +26,14 @@ export default function FormBuilder(){
     const removeQuestion=(id)=>{
         if(questions.length<=1) return;
         setQuestions(questions.filter(question=>question.id!==id))
+    }
+
+    const changeQuestionType=(id,value)=>{
+        setQuestions(questions.map((question)=>
+            question.id===id
+            ? {...question, question_type:value}
+            : question
+        ))
     }
 
     return(
@@ -48,15 +56,15 @@ export default function FormBuilder(){
                     </div>
             </div>
             <div className='w-full flex flex-col gap-3'>
-                {questions.map((question)=>{
-                return (
+                {questions.map((question)=>(
                         <QuestionCard
                             key={question.id}
                             removeQuestion={removeQuestion}
                             question={question}
                             oneQuestionRemains={questions.length===1}
+                            onTypeChange={changeQuestionType}
                         />
-                )})}
+                ))}
             <div className='w-full flex justify-center'>
             <Button
                 black={false}
