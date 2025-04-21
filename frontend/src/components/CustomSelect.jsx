@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 
 const CustomSelect = ({onChange, options, defaultValue, label, icon})=>{
   const [isOpen, setIsOpen] = useState(false)
-  const [selectedOption, setSelectedOption] = useState(defaultValue||options[0])
+  const [selectedOption, setSelectedOption] = useState(defaultValue??options[0])
   const dropdownRef = useRef(null)
 
   useEffect(()=>{
