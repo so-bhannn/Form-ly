@@ -21,3 +21,11 @@
     font-family: var(--font-geist);
     font-weight: 600;
 }
+
+html.dragging-within-zone * {
+    cursor: grabbing !important;
+}
+
+html.dragging-outside-zone * {
+    cursor: not-allowed !important;
+}

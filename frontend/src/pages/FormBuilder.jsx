@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import {
     Button,
@@ -10,6 +10,9 @@ export default function FormBuilder(){
     const[questions,setQuestions]=useState([
         {id:uuidv4(), text:"", question_type:"SA", is_required:"", order:1, options:[]},
     ])
+
+    const dragItem = useRef(null)
+    const dragOverItem = useRef(null)
 
     const addQuestion=()=>{
         const newOrder=questions.length>0
@@ -36,6 +39,27 @@ export default function FormBuilder(){
         ))
     }
 
+    const changeQuestionText=(id,value)=>{
+        setQuestions(questions.map((question)=>
+        question.id===id
+        ? {...question, text:value}
+        : question
+    ))
+    }
+
+    const handleSort = () => {
+        let rearrangedQuestions = [...questions]
+
+        const dragItemContent = rearrangedQuestions.splice(dragItem.current, 1)[0]
+
+        rearrangedQuestions.splice(dragOverItem.current, 0, dragItemContent)
+
+        setQuestions(rearrangedQuestions)
+
+        dragItem.current = null
+        dragOverItem.current = null
+    }
+
     return(
         <DashboardLayout>
             <div className="flex justify-between flex-wrap w-full pb-3.5">
@@ -55,14 +79,19 @@ export default function FormBuilder(){
                     />
                     </div>
             </div>
-            <div className='w-full flex flex-col gap-3'>
-                {questions.map((question)=>(
+            <div className='dropZone w-full flex flex-col gap-3'>
+                {questions.map((question,index)=>(
                         <QuestionCard
                             key={question.id}
+                            index={index}
                             removeQuestion={removeQuestion}
                             question={question}
                             oneQuestionRemains={questions.length===1}
                             onTypeChange={changeQuestionType}
+                            onTextChange={changeQuestionText}
+                            handleSort={handleSort}
+                            dragItem={dragItem}
+                            dragOverItem={dragOverItem}
                         />
                 ))}
             <div className='w-full flex justify-center'>
