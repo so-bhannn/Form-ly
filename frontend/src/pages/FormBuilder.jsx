@@ -10,9 +10,13 @@ export default function FormBuilder(){
     const[questions,setQuestions]=useState([
         {id:uuidv4(), text:"", question_type:"SA", is_required:"", order:1, options:[]},
     ])
+    const url=""
 
     const dragItem = useRef(null)
     const dragOverItem = useRef(null)
+
+    const [savingForm, setSavingForm] = useState(false)
+    const [message, setMessage] = useState({text: null, type: null})
 
     const addQuestion=()=>{
         const newOrder=questions.length>0
@@ -60,6 +64,57 @@ export default function FormBuilder(){
         dragOverItem.current = null
     }
 
+    const validateQuestions = () => {
+
+        const emptyIndexes = questions
+        .map((question, index) => !question.text.trim() ? index + 1 : null)
+        .filter(index => index !== null)
+
+        if(emptyIndexes.length > 0){
+            setMessage({text: `Please add text for question${emptyIndexes.length > 1 ? 's ':' '}${emptyIndexes.toString()}.`, type: 'error'})
+            return false
+        }
+
+        setMessage({text: null, type: null})
+        return true
+    }
+
+    const saveForm = async () => {
+        
+        setSavingForm(true)
+
+        if(!validateQuestions()){
+            window.scroll({top:0, behavior: 'smooth'})
+            return;
+        }
+
+        try{
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(questions)
+            })
+        
+            if(!response.ok){
+                console.log(response.status)
+                setMessage({text: 'Error Saving the form.', type: 'error'})
+            }
+
+            const data = await response.json()
+            console.log(data)
+            setMessage({text: 'Form saved succesfully!', type: 'success'})
+        }
+        catch(error){
+            setMessage({text: 'Error saving the form.', type: 'error'})
+            console.log(error)
+        }
+        finally{
+            setSavingForm(false)
+        }
+    }
+
     return(
         <DashboardLayout>
             <div className="flex justify-between flex-wrap w-full pb-3.5">
@@ -75,10 +130,14 @@ export default function FormBuilder(){
                     />
                     <Button
                         icon='bx bx-save'
-                        content='Save Form'
+                        content={`${'Save Form'}`}
+                        onClick={saveForm}
                     />
                     </div>
             </div>
+            {message.text && (
+                <div className={`${message.type==='error' ? 'text-red-600' : 'text-green-500'}`}>{message.text}</div>
+                )}
             <div className='dropZone w-full flex flex-col gap-3'>
                 {questions.map((question,index)=>(
                         <QuestionCard
