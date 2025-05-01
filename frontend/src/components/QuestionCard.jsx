@@ -159,6 +159,7 @@ const QuestionCard = memo(({
                             type="text"
                             placeholder="Question"
                             value={question.text}
+                            required
                             onChange={(e)=> onTextChange && onTextChange(question.id,e.target.value) }
                             className="w-full max-w-4xl flex-1 text-xl font-medium p-2 focus:outline-0 border-b-black/40 focus:bg-gray-50"
                         />

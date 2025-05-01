@@ -6,7 +6,6 @@ Forms_plan.tldr
 *.pot
 *.pyc
 __pycache__/
-settings.py
 db.sqlite3
 media
 migrations/
