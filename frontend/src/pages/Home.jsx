@@ -3,7 +3,17 @@ import {
     Button,
 } from '../components'
 
+import { useNavigate } from 'react-router-dom'
+
 const Home = ()=>{
+
+    const navigate = useNavigate();
+    const openEdit = () => {
+        navigate('/form/edit');
+    };
+    const openTemplates = () => {
+        navigate('/templates');
+    }
 
     return(
     <div className='flex flex-col w-full h-screen'>
@@ -20,10 +30,12 @@ const Home = ()=>{
                         <Button
                             content='Create'
                             icon='bx bx-right-arrow-alt'
+                            onClick={openEdit}
                         />
                         <Button
                             content='Explore Templates'
                             black={false}
+                            onClick={openTemplates}
                         />
                     </div>
                 </div>
@@ -31,7 +43,7 @@ const Home = ()=>{
                     <img loading='lazy' className='w-full h-full' src="https://kzmolc428s45p63rqfkc.lite.vusercontent.net/placeholder.svg?height=550&width=550" alt="Form illustration" />
                 </div>
             </div>
-            <div className='flex flex-col justify-between items-center md:bg-gray-50 md:p-30'>
+            <div className='text-center flex flex-col justify-between items-center md:bg-gray-50 md:p-15'>
                 <div>
                     <h1 className='text-center text-3xl md:text-5xl font-bricolage font-bold'>Features that make form creation easy.</h1>
                     <p className='text-center md:text-xl text-black/60'>Everything you need to create professional forms and collect responses efficiently.</p>
@@ -55,7 +67,7 @@ const Home = ()=>{
                 </div>
             </div>
         </div>
-        <div className='flex justify-between w-full h-16 bottom-0 p-5 border-gray-200 border-t '>
+        <div className='flex flex-col md:flex-row justify-between items-center gap-1.5 w-full h-16 bottom-0 p-5 border-gray-200 border-t '>
             <a href="/" className="flex gap-1 text-black/80">
                 <i className='bx bx-file text-3xl'></i>
                 <div className="font-bricolage font-bold text-2xl">Formly</div>
