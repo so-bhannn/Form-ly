@@ -60,11 +60,12 @@ const Dashboard = ()=>{
             <span className="w-full text-2xl font-bold py-5">
                 Recent Forms
             </span>
-            <div className="grid grid-cols-2 gap-6 w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
                 {formDetails.length && (
-                    sortedForm.map((formDetail)=>{
+                    sortedForm.map((formDetail,index)=>{
                         return(
                             <FormCard
+                                key={index}
                                 title={formDetail.title}
                                 description={formDetail.description}
                                 lastUpdated={formDetail.lastUpdated}

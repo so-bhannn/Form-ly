@@ -59,7 +59,7 @@ const AllForms = () => {
                 />
             </div>
             
-            <div className="grid grid-cols-2 gap-6 w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
                 {formDetails && (
                     formDetails.map((formDetail, index)=>{
                         return(
