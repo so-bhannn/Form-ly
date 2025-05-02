@@ -5,12 +5,14 @@ import {
     QuestionCard
 } from '../components'
 import { DashboardLayout } from '../layouts'
+const url = import.meta.env.VITE_API_URL
+
 export default function FormBuilder(){
 
     const[questions,setQuestions]=useState([
         {id:uuidv4(), text:"", question_type:"SA", is_required:"", order:1, options:[]},
     ])
-    const url=""
+
 
     const dragItem = useRef(null)
     const dragOverItem = useRef(null)
@@ -81,15 +83,15 @@ export default function FormBuilder(){
 
     const saveForm = async () => {
         
-        setSavingForm(true)
-
+        
         if(!validateQuestions()){
             window.scroll({top:0, behavior: 'smooth'})
             return;
         }
-
+        setSavingForm(true)
+        
         try{
-            const response = await fetch(url, {
+            const response = await fetch(`${url}/forms`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -98,17 +100,14 @@ export default function FormBuilder(){
             })
         
             if(!response.ok){
-                console.log(response.status)
                 setMessage({text: 'Error Saving the form.', type: 'error'})
             }
 
             const data = await response.json()
-            console.log(data)
             setMessage({text: 'Form saved succesfully!', type: 'success'})
         }
         catch(error){
             setMessage({text: 'Error saving the form.', type: 'error'})
-            console.log(error)
         }
         finally{
             setSavingForm(false)
@@ -130,8 +129,9 @@ export default function FormBuilder(){
                     />
                     <Button
                         icon='bx bx-save'
-                        content={`${'Save Form'}`}
+                        content={`${savingForm ? 'Saving...' :'Save Form'}`}
                         onClick={saveForm}
+                        disabled={savingForm}
                     />
                     </div>
             </div>
