@@ -91,7 +91,7 @@ export default function FormBuilder(){
         setSavingForm(true)
         
         try{
-            const response = await fetch(`${url}/forms`, {
+            const response = await fetch(`${url}/forms/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -107,7 +107,8 @@ export default function FormBuilder(){
             setMessage({text: 'Form saved succesfully!', type: 'success'})
         }
         catch(error){
-            setMessage({text: 'Error saving the form.', type: 'error'})
+            setMessage({text: 'Error.', type: 'error'})
+            console.error('Error:', error)
         }
         finally{
             setSavingForm(false)
