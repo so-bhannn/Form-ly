@@ -71,6 +71,8 @@ CORS_ALLOW_HEADERS = (
     *default_headers,
 )
 
+print(ALLOWED_HOSTS)
+print(CORS_ALLOWED_ORIGINS)
 
 ROOT_URLCONF = 'formly.urls'
 
