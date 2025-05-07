@@ -1,6 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 
-const CustomSelect = ({onChange, options, defaultValue, label, icon})=>{
+const CustomSelect = ({
+  onChange,
+  options,
+  defaultValue,
+  label,
+  icon})=>{
   const [isOpen, setIsOpen] = useState(false)
   const [selectedOption, setSelectedOption] = useState(defaultValue??options[0])
   const dropdownRef = useRef(null)
@@ -32,7 +37,7 @@ const CustomSelect = ({onChange, options, defaultValue, label, icon})=>{
       aria-expanded={isOpen}
       onClick={()=>setIsOpen(!isOpen)}
       className='flex items-center justify-between w-full border border-gray-300 rounded-md p-2 hover:cursor-pointer focus:ring-1 focus:ring-black/80 '>
-        <span className='text-sm'>{selectedOption.label}</span>
+        <span className='text-sm'>{selectedOption.text}</span>
         <i className={`bx bx-chevron-down transition-transform ${isOpen ? 'rotate-180':''}`}></i>
       </button>
 
@@ -46,7 +51,7 @@ const CustomSelect = ({onChange, options, defaultValue, label, icon})=>{
                 onClick={()=>handleSelect(option)}
                 className={`px-3 py-1 text-sm text-black/60 ${selectedOption.value===option.value?'text-black/80 bg-gray-100':''} hover:text-black/80 hover:bg-gray-100 hover:cursor-pointer`}
               >
-                {option.label}
+                {option.text}
               </li>
             )
             })}

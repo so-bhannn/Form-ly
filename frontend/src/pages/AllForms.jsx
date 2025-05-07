@@ -22,9 +22,9 @@ const AllForms = () => {
     ])
 
     const sortOptions = [
-        { value: "recent", label: "Most Recent" },
-        { value: "responses", label: "Most Responses" },
-        { value: "alpha", label: "Alphabetical" }
+        { value: "recent", text: "Most Recent" },
+        { value: "responses", text: "Most Responses" },
+        { value: "alpha", text: "Alphabetical" }
     ];
 
     const handleSortChange = (value) => {

@@ -5,7 +5,6 @@ import {
 export default function OptionList({
     options,
     type,
-    edit,
     addOption,
     removeOption,
     updateOption,
@@ -14,8 +13,8 @@ export default function OptionList({
     <div>
         {options.map((option,index)=>(
             <div key={option.id} className='flex items-center mb-2 gap-2'>
-                {type==='MC' && <input type="radio" disabled={edit}></input>}
-                {type==='CB' && <input type="checkbox" disabled={edit}></input>}
+                {type==='MC' && <input type="radio" disabled></input>}
+                {type==='CB' && <input type="checkbox" disabled></input>}
                 {type==='DD' && <span>{`${index+1}.`}</span>}
                 <input
                     type="text"

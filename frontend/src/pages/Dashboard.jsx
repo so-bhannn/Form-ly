@@ -50,7 +50,7 @@ const Dashboard = ()=>{
                 </div>
                 <div className="rounded-lg outline-1 outline-gray-200 shadow-sm p-6">
                     <div className="w-full pb-2 space-y-1.5">
-                        <h1 className="text-sm tracking-tight font-medium">Top Performing Card</h1>
+                        <h1 className="text-sm tracking-tight font-medium">Top Performing Form</h1>
                     </div>
                     <div className="pt-0">
                         <span className="text-3xl font-bold">My Form</span>
