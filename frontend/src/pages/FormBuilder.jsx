@@ -1,10 +1,11 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import {
     Button,
     QuestionCard
 } from '../components'
 import { DashboardLayout } from '../layouts'
+import { FormViewer } from '../components'
 const url = import.meta.env.VITE_API_URL
 
 export default function FormBuilder(){
@@ -12,13 +13,14 @@ export default function FormBuilder(){
     const[questions,setQuestions]=useState([
         {id:uuidv4(), text:"", question_type:"SA", is_required:"", order:1, options:[]},
     ])
-
-
+    
     const dragItem = useRef(null)
     const dragOverItem = useRef(null)
 
     const [savingForm, setSavingForm] = useState(false)
     const [message, setMessage] = useState({text: null, type: null})
+
+    const [edit, setEdit] = useState(true)
 
     const addQuestion=()=>{
         const newOrder=questions.length>0
@@ -52,6 +54,14 @@ export default function FormBuilder(){
         : question
     ))
     }
+
+    const changeOptions=useCallback((id,value)=>{
+        setQuestions(questions.map((question)=>
+            question.id===id
+            ? {...question, options: value}
+            : question
+        ))
+    },[questions])
 
     const handleSort = () => {
         let rearrangedQuestions = [...questions]
@@ -136,10 +146,24 @@ export default function FormBuilder(){
                     />
                     </div>
             </div>
+            <div className='w-full flex bg-gray-100 rounded-sm p-1 mb-6'>
+                    <button
+                    className={`w-1/2 rounded-xs p-1 ${edit ? 'bg-white text-black' : 'text-black/60'} hover:cursor-pointer`}
+                    onClick={()=>setEdit(true)}
+                    >
+                        Edit
+                    </button>
+                    <button
+                    className={`w-1/2 rounded-xs p-1 ${edit ? 'text-black/60' : 'bg-white text-black'} hover:cursor-pointer`}
+                    onClick={()=>setEdit(false)}
+                    >
+                        Preview
+                    </button>
+            </div>
             {message.text && (
                 <div className={`${message.type==='error' ? 'text-red-600' : 'text-green-500'}`}>{message.text}</div>
                 )}
-            <div className='dropZone w-full flex flex-col gap-3'>
+            {edit && (<div className='dropZone w-full flex flex-col gap-3'>
                 {questions.map((question,index)=>(
                         <QuestionCard
                             key={question.id}
@@ -149,6 +173,7 @@ export default function FormBuilder(){
                             oneQuestionRemains={questions.length===1}
                             onTypeChange={changeQuestionType}
                             onTextChange={changeQuestionText}
+                            onOptionChange={changeOptions}
                             handleSort={handleSort}
                             dragItem={dragItem}
                             dragOverItem={dragOverItem}
@@ -162,7 +187,12 @@ export default function FormBuilder(){
                 onClick={addQuestion}
             />
             </div>
-            </div>
+            </div>)}
+            {!edit && (
+                <FormViewer
+                questions={questions}
+                />
+            )}
         </DashboardLayout>
     )
 }
