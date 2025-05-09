@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 import {
     Button,
@@ -9,6 +10,8 @@ import { FormViewer } from '../components'
 const url = import.meta.env.VITE_API_URL
 
 export default function FormBuilder(){
+
+    const navigate = useNavigate()
 
     const[questions,setQuestions]=useState([
         {id:uuidv4(), text:"", question_type:"SA", is_required:"", order:1, options:[]},
@@ -129,7 +132,7 @@ export default function FormBuilder(){
         <DashboardLayout>
             <div className="flex justify-between flex-wrap w-full pb-3.5">
                 <div className='flex items-center gap-2'>
-                <i className='bx bx-left-arrow-alt text-3xl'></i>
+                <button onClick={() => navigate(-1)} className='flex justify-center items-center rounded-lg p-1 hover:bg-gray-100 cursor-pointer'><i className='bx bx-left-arrow-alt text-3xl'></i></button>
                 <h1 className="text-3xl font-bold mb-2 md:mb-0">Edit Form</h1>
                 </div>
                     <div className='flex justify-between gap-5'>
