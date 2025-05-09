@@ -6,13 +6,13 @@ import {
 import { useCallback, useState, memo, useEffect, useRef } from "react";
 
 const QuestionCard = memo(({
-    edit = true,
     removeQuestion,
     question,
     index,
     oneQuestionRemains,
     onTypeChange,
     onTextChange,
+    onOptionChange,
     handleSort,
     dragItem,
     dragOverItem,
@@ -23,33 +23,40 @@ const QuestionCard = memo(({
 
     
     const options = [
-        { value: 'SA', label: 'Short Question' },
-        { value: 'PA', label: 'Paragraph' },
-        { value: 'MC', label: 'Multiple Choice' },
-        { value: 'CB', label: 'Checkboxes' },
-        { value: 'DD', label: 'Drop-down' },
+        { value: 'SA', text: 'Short Question' },
+        { value: 'PA', text: 'Paragraph' },
+        { value: 'MC', text: 'Multiple Choice' },
+        { value: 'CB', text: 'Checkboxes' },
+        { value: 'DD', text: 'Drop-down' },
     ];
     const [isRequired, setIsRequired] = useState(false);
     const [question_type, setQuestion_type] = useState(question.question_type);
     const [nextId, setNextId] = useState(2);
-    const [multipleOptions, setMultipleOptions] = useState([
-        { id: 1, text: 'Option 1' }
-    ]);
+    const [multipleOptions, setMultipleOptions] = useState(question.options.length
+        ? question.options
+        : [{ id: 1, text: 'Option 1', value: 'Option 1' }]
+    );
  
     const addOption = useCallback(() => {
-        setMultipleOptions([...multipleOptions, { id: nextId, text: `Option ${nextId}` }]);
+        const newOptions = [...multipleOptions, { id: nextId, text: `Option ${nextId}`, value: `Option ${nextId}` }]
+        setMultipleOptions(newOptions);
         setNextId(nextId + 1);
-    }, [multipleOptions, nextId]);
+        onOptionChange && onOptionChange(question.id, newOptions)
+    }, [multipleOptions, nextId, onOptionChange, question]);
 
     const removeOption = useCallback((id) => {
         if (multipleOptions.length <= 1) return;
-        setMultipleOptions(multipleOptions.filter(option => option.id !== id));
-    }, [multipleOptions]);
+        const newOptions = multipleOptions.filter(option => option.id !== id)
+        setMultipleOptions(newOptions);
+        onOptionChange && onOptionChange(question.id, newOptions)
+    }, [multipleOptions, onOptionChange, question]);
 
     const updateOption = useCallback((id, text) => {
-        setMultipleOptions(multipleOptions.map(option =>
-            option.id === id ? { ...option, text } : option));
-    }, [multipleOptions]);
+        const newOptions = multipleOptions.map(option =>
+            option.id === id ? { ...option, text } : option)
+        setMultipleOptions(newOptions);
+        onOptionChange && onOptionChange(question.id, newOptions)
+    }, [multipleOptions,onOptionChange,question]);
 
     const handleTypeChange = (value) => {
         setQuestion_type(value);
@@ -84,7 +91,7 @@ const QuestionCard = memo(({
         document.documentElement.classList.remove('dragging-within-zone')
         document.documentElement.classList.remove('dragging-outside-zone')
 
-        if(dragItem !== null && dragItem !== null){
+        if(dragItem.current !== null && dragOverItem.current !== null){
             handleSort()
         }
     }
@@ -136,7 +143,7 @@ const QuestionCard = memo(({
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
                 onDragOver={(e) => e.preventDefault()}
-                className={`opacity-50 flex items-center justify-center w-10 cursor-grab active:cursor-grabbing ${isDragging?'dragging':''}`}>
+                className={`opacity-50 flex items-center justify-center pl-2 cursor-grab active:cursor-grabbing ${isDragging?'dragging':''}`}>
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"
@@ -153,7 +160,7 @@ const QuestionCard = memo(({
                 </div>
 
                 {/* Question content */}
-                <div className="w-full p-5 pl-0">
+                <div className="w-full p-5">
                     <div className="flex justify-between">
                         <input
                             type="text"
@@ -165,7 +172,7 @@ const QuestionCard = memo(({
                         />
 
                         {/* Controls */}
-                        <div className="flex gap-2 items-center">
+                        <div className={`flex gap-2 items-center`}>
                             {/* Required toggle */}
                             <div className="flex items-center ml-2">
                                 <button
@@ -196,7 +203,7 @@ const QuestionCard = memo(({
                     </div>
 
                     {/* Question type selector */}
-                    <div className="mt-3">
+                    <div className={`mt-3`}>
                         <CustomSelect
                             onChange={handleTypeChange}
                             options={options}
@@ -205,21 +212,21 @@ const QuestionCard = memo(({
                     </div>
 
                     {/* Question type specific inputs */}
-                    <div className="ml-5 mt-5">
+                    <div className={`ml-5 mt-5`}>
                         {question_type === 'SA' && (
                             <input
                                 type="text"
                                 placeholder='Short Answer text'
-                                disabled={edit}
-                                className={`w-full p-2.5 rounded-lg outline outline-gray-100 ${edit ? 'cursor-not-allowed' : ''}`}
+                                disabled
+                                className={`w-full p-2.5 rounded-lg outline outline-gray-100 cursor-not-allowed`}
                             />
                         )}
 
                         {question_type === 'PA' && (
                             <textarea
                                 placeholder='Long Answer text'
-                                disabled={edit}
-                                className={`min-h-20 w-full p-2.5 rounded-lg outline outline-gray-100 ${edit ? 'cursor-not-allowed' : ''}`}
+                                disabled
+                                className={`min-h-20 w-full p-2.5 rounded-lg outline outline-gray-100 cursor-not-allowed`}
                             />
                         )}
 
@@ -227,7 +234,6 @@ const QuestionCard = memo(({
                             <OptionList
                                 options={multipleOptions}
                                 type={question_type}
-                                edit={edit}
                                 addOption={addOption}
                                 updateOption={updateOption}
                                 removeOption={removeOption}
