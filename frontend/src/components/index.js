@@ -4,6 +4,8 @@ import Navbar from "./Navbar.jsx"
 import CustomSelect from "./CustomSelect.jsx"
 import QuestionCard from "./QuestionCard.jsx"
 import OptionList from "./OptionList.jsx"
+import PreviewQuestionCard from "./PreviewQuestionCard.jsx"
+import FormViewer from "./FormViewer.jsx"
 
 export {
     Button,
@@ -12,4 +14,6 @@ export {
     CustomSelect,
     QuestionCard,
     OptionList,
+    PreviewQuestionCard,
+    FormViewer,
 }
