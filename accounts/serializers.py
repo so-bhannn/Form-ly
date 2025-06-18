@@ -1,70 +1,63 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model,authenticate
+from .models import CustomUser
 
-User= get_user_model()
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model=User
-        fields=('username','email')
-    
 class RegisterSerializer(serializers.ModelSerializer):
-    password=serializers.CharField(
-        write_only=True,
-        required=True,
-    )
     
-    password2=serializers.CharField(
-        write_only=True,
-        required=True,
-    )
-
-    email= serializers.EmailField(required=True)
-
+    password = serializers.CharField(write_only=True,required=True)
     class Meta:
-        model=User
-        fields=('username','email','password','password2')
-
+        model=CustomUser
+        fields=('id','email','password','first_name','last_name','avatar')
+        extra_kwargs={
+            'id':{'read_only': True},
+            'avatar':{'required':False}
+        }
+    
     def validate_email(self,email):
-        if User.objects.filter(email__iexact=email).exists():
-            raise serializers.ValidationError("An account with the same email exists.")
+        if CustomUser.objects.filter(email=email).exists():
+            raise serializers.ValidationError({"email":"A user with this email already exists."})
         return email
-    
-    def validate_username(self,username):
-        if User.objects.filter(username__iexact=username).exists():
-            raise serializers.ValidationError("An account with the same username exists.")
-        return username
-    
-    def validate(self, attrs):
-        if attrs['password']!=attrs['password2']:
-            raise serializers.ValidationError("Both the passwords must match.")
-        return attrs
+
+    def validate(self, data):
+        error={}
+        if not data.get('password'):
+            error['password']='This field is required.'
+        if not data.get('first_name'):
+            error['first_name']='This field is required.'
+
+        if error:
+            raise serializers.ValidationError(error)
+        
+        return data
     
     def create(self, validated_data):
-        validated_data.pop('password2')
-        password=validated_data.pop('password')
+        password=validated_data.pop('password', None)
+        user = self.Meta.model(**validated_data)
 
-        user=User(**validated_data)
         user.set_password(password)
         user.save()
+
         return user
     
+
 class LoginSerializer(serializers.Serializer):
-    email= serializers.CharField(write_only=True)
-    password= serializers.CharField(write_only=True)
 
-    def validate(self, attrs):
-        email = attrs.get('email')
-        password = attrs.get('password')
+    email= serializers.EmailField()
+    password= serializers.CharField()
 
-        if email and password:
-            user = authenticate(request=self.context.get('request'), username=email, password=password)
+    def validate(self, data):
+        error = {}
 
-            if not user:
-                raise serializers.ValidationError('Error authenticating the user.', code='authorization')
+        if not data.get('password'):
+            error['password']= "This field is required"
+        if not data.get('email'):
+            error['email']= "This field is required"
+
+        if error:
+            raise serializers.ValidationError(error)
         
-        else:
-            raise serializers.ValidationError('Correct data not provided.', code='authorization')
-        
-        attrs['user']=user
-        return attrs
+        user = authenticate(email=data.get('email'), password=data.get('password'))
+        if not user:
+            raise serializers.ValidationError({"non_field_errors": "Invalid credentials"})
+        data['user'] = user
+        return data
