@@ -71,8 +71,6 @@ CORS_ALLOW_HEADERS = (
     *default_headers,
 )
 
-print(ALLOWED_HOSTS)
-print(CORS_ALLOWED_ORIGINS)
 
 ROOT_URLCONF = 'formly.urls'
 
@@ -126,9 +124,11 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTHENTICATION_BACKENDS=[
     'accounts.backends.EmailBackend',
+    'accounts.backends.GoogleOAuthBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
+AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -162,9 +162,12 @@ REST_FRAMEWORK={
     ]
 }
 
+ACCESS_TOKEN_LIFETIME = config('ACCESS_TOKEN_LIFETIME', cast=int)
+REFRESH_TOKEN_LIFETIME = config('REFRESH_TOKEN_LIFETIME', cast=int)
+
 SIMPLE_JWT={
-    'ACCESS_TOKEN_LIFETIME':timedelta(minutes=60),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=15),
+    'ACCESS_TOKEN_LIFETIME':timedelta(minutes=ACCESS_TOKEN_LIFETIME),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=REFRESH_TOKEN_LIFETIME),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
 }
