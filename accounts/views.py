@@ -1,10 +1,11 @@
 from rest_framework import permissions,status
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework import exceptions
 
-from .serializers import RegisterSerializer,UserSerializer,LoginSerializer
-from .utils.tokens import get_tokens_for_user
+from .models import RefreshToken
+from .serializers import UserSerializer, RegisterSerializer,LoginSerializer,GoogleSignInSerializer
+from .tokens import get_tokens_for_user
 class RegisterView(GenericAPIView):
     serializer_class=RegisterSerializer
     permission_classes=[permissions.AllowAny]
@@ -17,8 +18,10 @@ class RegisterView(GenericAPIView):
 
         refresh_token, access_token = get_tokens_for_user(user)
 
+        RefreshToken.objects.create(user=user, token= refresh_token, )
+
         return Response({
-            'user':UserSerializer(user, context=self.get_serializer_context()).data,
+            'user': UserSerializer(user).data,
             'refresh': refresh_token,
             'access': access_token,
             'message': 'User registered successfully'
@@ -29,9 +32,9 @@ class LoginView(GenericAPIView):
     permission_classes=[permissions.AllowAny]
 
     def post(self,request,*args, **kwargs):
-        serializer = self.get_serializer(data=request.data, context={'request': request})
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
+        user = authenticate(serializer.validated_data)
 
         if not user:
             raise AuthenticationFailed("User does not exists")
@@ -39,8 +42,30 @@ class LoginView(GenericAPIView):
         refresh_token, access_token = get_tokens_for_user(user)
 
         return Response({
-            'user': UserSerializer(user, context=self.get_serializer_context()).data,
+            'user':UserSerializer(user).data,
             'refresh': refresh_token,
             'access': access_token,
-            'message': 'Logged in successfully'
+            'message': 'User Logged in successfully'
         },status=status.HTTP_200_OK)
+
+class GoogleSignInView(GenericAPIView):
+
+    serializer_class=GoogleSignInSerializer
+    permission_classes=[permissions.AllowAny]
+
+    def post(self, request,*args, **kwargs):
+        serializer=self.get_serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user, msg = authenticate(serializer.validated_data)
+
+        if not user:
+            raise exceptions.AuthenticationFailed(msg)
+        
+        refresh_token, acces_token = get_tokens_for_user(user)
+
+        return Response({
+            'user':UserSerializer(user).data,
+            'refresh': refresh_token,
+            'access': acces_token,
+            'message': msg
+        })

@@ -2,8 +2,9 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
 User =get_user_model()
-
-
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields=('email', 'auth_provider', 'first_name', 'last_name', 'avatar', 'is_active')
 
 class RegisterSerializer(serializers.ModelSerializer):
     
@@ -35,3 +36,5 @@ class LoginSerializer(serializers.Serializer):
         email=email.lower()
         return email
 
+class GoogleOAuthSerializer(serializers.Serializer):
+    id_token = serializers.CharField(required=True)
