@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 User =get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
+        model =User
         fields=('email', 'auth_provider', 'first_name', 'last_name', 'avatar', 'is_active')
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -11,7 +12,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True,required=True)
     class Meta:
         model=User
-        fields=('id','email','social_id','first_name','last_name','avatar')
+        fields=('id','email','password','social_id','first_name','last_name','avatar')
         extra_kwargs={
             'social_id':{'required':False},
             'avatar':{'required':False}
