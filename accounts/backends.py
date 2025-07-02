@@ -7,9 +7,11 @@ from decouple import config
 User=get_user_model()
 
 class EmailBackend(ModelBackend):
-    def authenticate(self, request, username = None, password = None, **kwargs):
+    def authenticate(self, request, **kwargs):
+        email= kwargs.get('email')
+        password= kwargs.get('password')
         try:
-            user=User.objects.get(email=username)
+            user=User.objects.get(email=email)
         except User.DoesNotExist:
             return None
         
@@ -18,10 +20,10 @@ class EmailBackend(ModelBackend):
         return None
     
 class GoogleOAuthBackend(BaseBackend):
-    def authenticate(self, request, *kwargs):
+    def authenticate(self, request, **kwargs):
         id_token_str= kwargs.get('id_token')
         if not id_token_str:
-            return None, 'ID token not found'
+            return None
         
         try:
             user_info = id_token.verify_oauth2_token(
@@ -36,8 +38,8 @@ class GoogleOAuthBackend(BaseBackend):
             avatar=user_info['picture']
 
         except:
-            return None, 'User verification by Google failed'
-        
+            return None
+
         try:
             user = User.objects.filter(social_id=google_sub_id).first()
 
@@ -55,7 +57,7 @@ class GoogleOAuthBackend(BaseBackend):
             if update_fields:
                 user.save(update_fields=update_fields)
 
-            return user, 'User Logged in successfully.'
+            return user
         
         except User.DoesNotExist:
             user= User.objects.create_user(
@@ -67,7 +69,7 @@ class GoogleOAuthBackend(BaseBackend):
                 avatar=avatar
             )
 
-            return user, 'User registered successfully.'
+            return user
         
     def get_user(self, user_id):
         try:
