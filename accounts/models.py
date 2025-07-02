@@ -73,9 +73,3 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     
     def __str__(self):
         return f'{self.first_name} {self.last_name} ({self.email}) ({self.auth_provider})'
-
-class RefreshToken(models.Model):
-    user =models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='refresh_tokens')
-    token = models.TextField(unique=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    expires_at =models.DateTimeField(editable=False, default= get_token_expiration_time)
