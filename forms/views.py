@@ -1,18 +1,18 @@
-from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import ModelViewSet
 from .models import Form
-from .serializers import FormSerializer
-
+from .serializers import FormReadSerializer,FormWriteSerializerr
 
 class FormViewSet(ModelViewSet):
-    serializer_class=FormSerializer
     permission_classes=[IsAuthenticated]
-
-    def get_queryset(self):
-        user=self.request.user
-        if user.is_authenticated:
-            queryset=Form.objects.filter(owner=user)
-            return queryset
     
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+    def get_queryset(self):
+        return Form.objects.filter(owner=self.request.user).prefetch_related('questions__options')
+    
+    def get_serializer_class(self):
+        if self.action in ['create','update','partial_update']:
+            return FormWriteSerializerr
+        return FormReadSerializer
+    
+    def get_serializer_context(self):
+        return {'request': self.request}
