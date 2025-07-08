@@ -14,8 +14,8 @@ class Form(models.Model):
     title = models.CharField(max_length=100, blank=False)
     description = models.TextField(blank=True)
     form_id = models.UUIDField(unique=True, default=uuid.uuid4, editable=False, primary_key=True)
-
-    REQUIRED_FIELDS = ['owner', 'title']
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    updated_at= models.DateTimeField(auto_now=True)
 
 class QuestionType(models.TextChoices):
     SHORT_ANSWER= 'SA', 'Short Answer'
@@ -30,20 +30,19 @@ class Question(models.Model):
         on_delete=models.CASCADE,
         related_name='questions'
     )
+    id= models.CharField(max_length=100,blank=False)
     text = models.CharField( max_length=200)
-    description = models.TextField(blank=True)
     question_type= models.CharField(
         max_length=2,
         choices=QuestionType.choices,
         default=QuestionType.SHORT_ANSWER
     )
     is_required= models.BooleanField(default=False)
-    order = models.PositiveIntegerField(default=0)
+    order = models.PositiveIntegerField()
 
     class Meta:
-        ordering = ['order', 'id']
-
-    REQUIRED_FIELDS=['form', 'text', 'question_type', 'is_required']
+        unique_together=(('form','order'))
+        ordering = ['order']
 
 class Option(models.Model):
     question = models.ForeignKey(
@@ -51,7 +50,13 @@ class Option(models.Model):
         on_delete=models.CASCADE,
         related_name='options'
     )
+    id= models.CharField(max_length=100,blank=False)
     text = models.CharField(max_length=30)
+    order= models.PositiveIntegerField()
+
+    class Meta:
+        unique_together=(('question','order'))
+        ordering=['order']
 
 class Response(models.Model):
     respondent = models.ForeignKey(
