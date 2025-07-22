@@ -4,7 +4,7 @@ from django.urls import path,include
 
 router = DefaultRouter()
 
-router.register(r'forms',FormViewSet,basename='form')
+router.register(r'',FormViewSet,basename='form')
 
 urlpatterns = [
     path('',include(router.urls))

@@ -14,7 +14,7 @@ class Form(models.Model):
     title = models.CharField(max_length=100, blank=False)
     description = models.TextField(blank=True)
     form_id = models.UUIDField(unique=True, default=uuid.uuid4, editable=False, primary_key=True)
-    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    created_at = models.DateTimeField( auto_now_add=True)
     updated_at= models.DateTimeField(auto_now=True)
 
 class QuestionType(models.TextChoices):
@@ -30,7 +30,7 @@ class Question(models.Model):
         on_delete=models.CASCADE,
         related_name='questions'
     )
-    id= models.CharField(max_length=100,blank=False)
+    question_id= models.CharField(max_length=100,blank=False)
     text = models.CharField( max_length=200)
     question_type= models.CharField(
         max_length=2,
@@ -50,7 +50,7 @@ class Option(models.Model):
         on_delete=models.CASCADE,
         related_name='options'
     )
-    id= models.CharField(max_length=100,blank=False)
+    option_id= models.CharField(max_length=100,blank=False)
     text = models.CharField(max_length=30)
     order= models.PositiveIntegerField()
 
@@ -59,12 +59,6 @@ class Option(models.Model):
         ordering=['order']
 
 class Response(models.Model):
-    respondent = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete = models.SET_NULL,
-        null=True, blank=True
-    )
-
     form = models.ForeignKey(
         Form,
         on_delete=models.CASCADE,

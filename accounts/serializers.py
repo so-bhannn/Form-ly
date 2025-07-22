@@ -14,10 +14,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         model=User
         fields=('id','email','password','social_id','first_name','last_name','avatar')
         extra_kwargs={
+            'id':{'required':False},
             'social_id':{'required':False},
             'avatar':{'required':False}
         }
-    
+
     def validate_email(self,email):
         email = email.lower()
         if User.objects.filter(email=email).exists():
@@ -27,7 +28,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
         return user
-    
+
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)

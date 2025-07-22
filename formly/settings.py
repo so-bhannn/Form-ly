@@ -27,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DJANGO_DEBUG')
+DEBUG = config('DJANGO_DEBUG', cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOST', default = 'localhost,127.0.0.1').split(',')
 
@@ -164,6 +164,7 @@ REST_FRAMEWORK={
 
 ACCESS_TOKEN_LIFETIME = config('ACCESS_TOKEN_LIFETIME', cast=int)
 REFRESH_TOKEN_LIFETIME = config('REFRESH_TOKEN_LIFETIME', cast=int)
+REFRESH_TOKEN_MAX_AGE= timedelta(days=REFRESH_TOKEN_LIFETIME).total_seconds()
 
 SIMPLE_JWT={
     'ACCESS_TOKEN_LIFETIME':timedelta(minutes=ACCESS_TOKEN_LIFETIME),

@@ -6,7 +6,7 @@ from django.db import transaction
 class OptionReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Option
-        fields = ['text','order']
+        fields = ['option_id','text','order']
 
 class QuestionReadSerializer(serializers.ModelSerializer):
 
@@ -15,25 +15,25 @@ class QuestionReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Question
-        fields = ['id','text', 'question_type', 'is_required', 'options' ]
+        fields = ['question_id','text', 'question_type', 'is_required', 'options' ]
 
 class FormReadSerializer(serializers.ModelSerializer):
     owner =serializers.ReadOnlyField(source='owner.username')
     questions= QuestionReadSerializer(many=True, read_only=True)
     class Meta:
         model = Form
-        fields = ['title','description','owner','form_id', 'questions']
+        fields = ['title','description','owner','form_id', 'questions','updated_at']
 
 
 #WRITE(Create and Update) Serializers
 class OptionWriteSerializer(serializers.Serializer):
-    id = serializers.CharField(maz_length=100)
+    option_id = serializers.CharField(max_length=100)
     text=serializers.CharField(max_length=200)
     order= serializers.IntegerField()
 
 class QuestionWriteSerializer(serializers.Serializer):
     options=OptionWriteSerializer(many=True, required=False)
-    id=serializers.CharField(max_length=20)
+    question_id=serializers.CharField(max_length=100)
     text=serializers.CharField(max_length=200)
     question_type=serializers.ChoiceField(choices=QuestionType.choices)
     order=serializers.IntegerField()
@@ -71,7 +71,7 @@ class FormWriteSerializer(serializers.ModelSerializer):
         )
 
         for question_data in questions_data:
-            options_data=question_data.pop('options')
+            options_data=question_data.pop('options',None)
             question=Question.objects.create(form=form,**question_data)
 
             if options_data:
@@ -103,7 +103,7 @@ class FormWriteSerializer(serializers.ModelSerializer):
         questions_to_update=[]
 
         for question_data in questions_data:
-            question_id=question_data.get('id')
+            question_id=question_data.get('question_id')
             incoming_question_ids.add(question_id)
 
             if question_id in existing_questions:
