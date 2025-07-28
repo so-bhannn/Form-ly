@@ -1,11 +1,28 @@
-from django.db import models
-from django.contrib.auth.models import BaseUserManager
+from django.db import models,IntegrityError
 from django.conf import settings
+from django.contrib.auth import get_user_model
 import uuid
 
 # Create your models here.
 
-class Form(models.Model):
+User=get_user_model()
+
+class UniqueIDMOdel(models.Model):
+    uuid= models.UUIDField(unique=True, default=uuid.uuid4, editable=False, primary_key=True)
+
+    def save(self, *args, **kwargs):
+        while self._state.adding:
+            try:
+                super().save(*args, **kwargs)
+            except IntegrityError:
+                self.uuid=uuid.uuid4()
+        else:
+            super().save(*args, **kwargs)
+
+    class Meta:
+        abstract=True
+
+class Form(UniqueIDMOdel):
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -13,7 +30,6 @@ class Form(models.Model):
     
     title = models.CharField(max_length=100, blank=False)
     description = models.TextField(blank=True)
-    form_id = models.UUIDField(unique=True, default=uuid.uuid4, editable=False, primary_key=True)
     created_at = models.DateTimeField( auto_now_add=True)
     updated_at= models.DateTimeField(auto_now=True)
 
@@ -24,14 +40,13 @@ class QuestionType(models.TextChoices):
     DROPDOWN= 'DD', 'Dropdown'
     CHECKBOX= 'CB', 'Checkbox'
 
-class Question(models.Model):
+class Question(UniqueIDMOdel):
     form = models.ForeignKey(
         Form,
         on_delete=models.CASCADE,
         related_name='questions'
     )
-    question_id= models.CharField(max_length=100,blank=False)
-    text = models.CharField( max_length=200)
+    text = models.CharField(max_length=200)
     question_type= models.CharField(
         max_length=2,
         choices=QuestionType.choices,
@@ -44,13 +59,12 @@ class Question(models.Model):
         unique_together=(('form','order'))
         ordering = ['order']
 
-class Option(models.Model):
+class Option(UniqueIDMOdel):
     question = models.ForeignKey(
         Question,
         on_delete=models.CASCADE,
         related_name='options'
     )
-    option_id= models.CharField(max_length=100,blank=False)
     text = models.CharField(max_length=30)
     order= models.PositiveIntegerField()
 
@@ -58,11 +72,17 @@ class Option(models.Model):
         unique_together=(('question','order'))
         ordering=['order']
 
-class Response(models.Model):
+class Response(UniqueIDMOdel):
     form = models.ForeignKey(
         Form,
         on_delete=models.CASCADE,
         related_name='responses'
+    )
+    respondant=models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
     )
 
     submitted_at = models.DateTimeField(auto_now_add=True, editable=False)
@@ -76,7 +96,7 @@ class Answer(models.Model):
     response = models.ForeignKey(
         Response,
         on_delete=models.CASCADE,
-        related_name='answers'
+        related_name='answers_in_response'
     )
 
-    value = models.JSONField()
+    value = models.TextField(blank=True)
