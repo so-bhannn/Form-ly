@@ -36,7 +36,7 @@ const CustomSelect = ({
       aria-haspopup="listbox"
       aria-expanded={isOpen}
       onClick={()=>setIsOpen(!isOpen)}
-      className='flex items-center justify-between w-full border border-gray-300 rounded-md p-2 hover:cursor-pointer focus:ring-1 focus:ring-black/80 '>
+      className='bg-white flex items-center justify-between w-full border border-gray-300 rounded-md p-2 hover:cursor-pointer focus:ring-1 focus:ring-black/80 '>
         <span className='text-sm'>{selectedOption.text}</span>
         <i className={`bx bx-chevron-down transition-transform ${isOpen ? 'rotate-180':''}`}></i>
       </button>
