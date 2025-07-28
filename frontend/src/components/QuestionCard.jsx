@@ -1,18 +1,20 @@
 import {
-    Button,
     OptionList,
     CustomSelect,
+    AutoResizingTextArea
 } from '../components';
 import { useCallback, useState, memo, useEffect, useRef } from "react";
 
 const QuestionCard = memo(({
     removeQuestion,
     question,
+    isRequired,
     index,
     oneQuestionRemains,
     onTypeChange,
     onTextChange,
     onOptionChange,
+    onRequiredChange,
     handleSort,
     dragItem,
     dragOverItem,
@@ -21,7 +23,8 @@ const QuestionCard = memo(({
     const dragHandleRef= useRef()
     const cardRef = useRef(null);
 
-    
+    const question_type = question.question_type
+
     const options = [
         { value: 'SA', text: 'Short Question' },
         { value: 'PA', text: 'Paragraph' },
@@ -29,44 +32,46 @@ const QuestionCard = memo(({
         { value: 'CB', text: 'Checkboxes' },
         { value: 'DD', text: 'Drop-down' },
     ];
-    const [isRequired, setIsRequired] = useState(false);
-    const [question_type, setQuestion_type] = useState(question.question_type);
+
     const [nextId, setNextId] = useState(2);
-    const [multipleOptions, setMultipleOptions] = useState(question.options.length
+    const [multipleOptions, setMultipleOptions] = useState(question.options?.length
         ? question.options
-        : [{ id: 1, text: 'Option 1', value: 'Option 1' }]
+        : [{ option_id: 1, text: 'Option 1', value: 'Option 1' }]
     );
- 
+
     const addOption = useCallback(() => {
-        const newOptions = [...multipleOptions, { id: nextId, text: `Option ${nextId}`, value: `Option ${nextId}` }]
+        const newOptions = [...multipleOptions, { option_id: nextId, text: `Option ${nextId}`, value: `Option ${nextId}` }]
         setMultipleOptions(newOptions);
         setNextId(nextId + 1);
-        onOptionChange && onOptionChange(question.id, newOptions)
+        onOptionChange && onOptionChange(question.question_id, newOptions)
     }, [multipleOptions, nextId, onOptionChange, question]);
 
     const removeOption = useCallback((id) => {
         if (multipleOptions.length <= 1) return;
-        const newOptions = multipleOptions.filter(option => option.id !== id)
+        const newOptions = multipleOptions.filter(option => option.option_id !== id)
         setMultipleOptions(newOptions);
-        onOptionChange && onOptionChange(question.id, newOptions)
+        onOptionChange && onOptionChange(question.question_id, newOptions)
     }, [multipleOptions, onOptionChange, question]);
 
     const updateOption = useCallback((id, text) => {
         const newOptions = multipleOptions.map(option =>
-            option.id === id ? { ...option, text } : option)
+            option.option_id === id ? { ...option, text } : option)
         setMultipleOptions(newOptions);
-        onOptionChange && onOptionChange(question.id, newOptions)
+        onOptionChange && onOptionChange(question.question_id, newOptions)
     }, [multipleOptions,onOptionChange,question]);
 
+    const handleRequiredChange =()=>{
+        onRequiredChange && onRequiredChange(question.question_id, !isRequired)
+    }
+
     const handleTypeChange = (value) => {
-        setQuestion_type(value);
-        if (onTypeChange) onTypeChange(question.id, value);
+        if (onTypeChange) onTypeChange(question.question_id, value);
     };
 
     const handleDragStart = (e) => {
         if(cardRef.current){
             e.dataTransfer.effectAllowed = "move";
-            e.dataTransfer.setData("text/plain", question.id.toString())
+            e.dataTransfer.setData("text/plain", question.question_id.toString())
 
             const crt = cardRef.current.cloneNode(true)
             crt.style.opacity="1"
@@ -133,8 +138,8 @@ const QuestionCard = memo(({
         <>
             <div
                 ref={cardRef}
-                className={`flex w-full rounded-lg bg-white border border-gray-200 ${isDragging ? 'opacity-0' : 'opacity-100'}`}
-                onDragEnter={(e) => (dragOverItem.current = index) }
+                className={`flex w-full min-h-fit rounded-lg bg-white border border-gray-200 ${isDragging ? 'opacity-0' : 'opacity-100'}`}
+                onDragEnter={() => (dragOverItem.current = index) }
             >
                 {/* Drag handle */}
                 <div 
@@ -160,15 +165,15 @@ const QuestionCard = memo(({
                 </div>
 
                 {/* Question content */}
-                <div className="w-full p-5">
-                    <div className="flex justify-between">
-                        <input
-                            type="text"
+                <div className="w-full p-5 flex flex-col">
+                    <div className="flex flex-col md:flex-row justify-between">
+                        <AutoResizingTextArea
                             placeholder="Question"
                             value={question.text}
                             required
-                            onChange={(e)=> onTextChange && onTextChange(question.id,e.target.value) }
-                            className="w-full max-w-4xl flex-1 text-xl font-medium p-2 focus:outline-0 border-b-black/40 focus:bg-gray-50"
+                            onChange={(e)=> onTextChange && onTextChange(question.question_id,e.target.value) }
+                            className="w-full max-w-4xl text-lg md:text-xl font-medium px-2 mb-4 focus:outline-0 border-b-black/40 focus:bg-gray-50 "
+                            rows="1"
                         />
 
                         {/* Controls */}
@@ -180,7 +185,7 @@ const QuestionCard = memo(({
                                     role="switch"
                                     aria-checked={isRequired}
                                     className={`relative inline-flex h-5 w-9 items-center rounded-full cursor-pointer ${isRequired ? 'bg-black/80' : 'bg-gray-200'}`}
-                                    onClick={() => setIsRequired(!isRequired)}
+                                    onClick={handleRequiredChange}
                                 >
                                     <span className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition transform ${isRequired ? 'translate-x-5' : 'translate-x-1'}`}></span>
                                 </button>
@@ -189,7 +194,7 @@ const QuestionCard = memo(({
 
                             {/* Delete button */}
                             <button
-                                onClick={() => removeQuestion(question.id)}
+                                onClick={() => removeQuestion(question.question_id)}
                                 disabled={oneQuestionRemains}
                                 className={`w-9 h-9 inline-flex justify-center items-center rounded-lg ${oneQuestionRemains ? 'cursor-not-allowed' : 'hover:bg-gray-100 cursor-pointer'}`}
                             >
