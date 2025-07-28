@@ -1,27 +1,26 @@
+import { useEffect } from 'react'
 import './App.css'
-import {
-  Home,
-  Dashboard,
-  AllForms,
-  FormBuilder,
-} from './pages'
 
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
+import { useAuth } from './hooks/useAuth'
+import { setAuthAccessor } from './api/axios'
+import { Routes } from './routes'
 
 function App() {
 
+  const {accessToken, setAccessToken} =useAuth()
+
+  useEffect(()=>{
+    setAuthAccessor({
+      getAuth: ()=>accessToken,
+      setFreshToken:(token)=>setAccessToken(token),
+    })
+  }, [accessToken, setAccessToken])
+
   return (
     <>
-    <Router>
       <div className="App">
-        <Routes>
-          <Route path='/' element={<Home/>} />
-          <Route path='/dashboard' element={<Dashboard/>} />
-          <Route path='/forms' element={<AllForms/>} />
-          <Route path='/form/edit' element={<FormBuilder/>}></Route>
-        </Routes>
+        <Routes/>
       </div>
-    </Router>
     </>
   )
 }
