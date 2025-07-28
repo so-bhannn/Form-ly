@@ -1,5 +1,6 @@
+import json
 from rest_framework import serializers
-from .models import Form, Question, Option, QuestionType
+from .models import Form, Question, Option, QuestionType, Response, Answer
 from django.db import transaction
 
 #READ(List and Retrieve) Serializers
@@ -49,7 +50,7 @@ class QuestionWriteSerializer(serializers.Serializer):
         ]
 
         if question_type in option_question_types and not options:
-            serializers.ValidationError(f'Options are required for: {QuestionType(question_type).label} Questions.')
+            raise serializers.ValidationError(f'Options are required for: {QuestionType(question_type).label} Questions.')
         return data
 
 class FormWriteSerializer(serializers.ModelSerializer):
@@ -151,41 +152,131 @@ class FormWriteSerializer(serializers.ModelSerializer):
         return instance
 
     def _update_options(self, question_instance, options_data):
-        existing_options={opt.id:opt for opt in question_instance.options.all()}
-        incoming_options=set()
-        options_to_create=[]
-        options_to_update=[]
+        existing_options = {opt.id: opt for opt in question_instance.options.all()}
+        incoming_option_ids = {opt_data.get('id') for opt_data in options_data if opt_data.get('id')}
 
+        options_to_update = []
         for option_data in options_data:
-            option_id=option_data.get('id')
-            incoming_options.add(option_id)
-
-            if option_id in existing_options:
-                option_instance=existing_options[option_id]
-                option_update_fields=[]
-
-                new_text=option_data.get('text',option_instance.text)
-                if option_instance.text!=new_text:
-                    option_instance.text=new_text
-                    option_update_fields.append('text')
-
-                new_order=option_data.get('order',option_instance.order)
-                if option_instance.order!=new_order:
-                    option_instance.order=new_order
-                    option_update_fields.append('order')
-
-                if option_update_fields:
-                    options_to_update.append(option_instance)
-
+            option_id = option_data.get('id')
+            
+            if option_id and option_id in existing_options:
+                option_instance = existing_options[option_id]
+                option_instance.text = option_data['text']
+                option_instance.order = option_data['order']
+                options_to_update.append(option_instance)
             else:
-                options_to_create.append(Option(question=question_instance, **option_data))
-
-        if options_to_create:
-            Option.objects.bulk_create(options_to_create)
+                option_data.pop('id', None)
+                Option.objects.create(question=question_instance, **option_data)
 
         if options_to_update:
-            Option.objects.bulk_update(options_to_update,option_update_fields)
+            Option.objects.bulk_update(options_to_update, ['text', 'order'])
 
-        option_ids_to_delete=set(existing_options.keys())-incoming_options
+        option_ids_to_delete = set(existing_options.keys()) - incoming_option_ids
         if option_ids_to_delete:
             Option.objects.filter(id__in=option_ids_to_delete).delete()
+
+class AnswerWriteSerializer(serializers.Serializer):
+    question_id=serializers.CharField(max_length=100)
+    value=serializers.JSONField(required=True)
+
+class ResponseSubmitSerializer(serializers.Serializer):
+    answers=AnswerWriteSerializer(many=True)
+
+    def validate(self,data):
+        answers_data=data.get('answers',[])
+        if not answers_data:
+            raise serializers.ValidationError("There is no data provided for answers.")
+        
+        question_ids=[answer['question_id'] for answer in answers_data]
+        questions=Question.objects.in_bulk(question_ids,field_name='question_id')
+
+        for answer_data in answers_data:
+            question_id=answer_data.get('question_id')
+            value=answer_data.get('value')
+
+            question=questions.get(question_id)
+            if not question:
+                raise serializers.ValidationError(f"No question exists with id: {question_id}")
+
+            if question.question_type == QuestionType.CHECKBOX:
+                if not isinstance(value,list):
+                    raise serializers.ValidationError("The answer value should be in array format for Checkbox question type.")
+                answer_data['value']=json.dumps(value)
+            else:
+                if not isinstance(value,str):
+                    raise serializers.ValidationError('The answer value should be in string format for this question type.')
+
+        return data
+
+    @transaction.atomic
+    def create(self,validated_data):
+        form=self.context['form']
+        request=self.context['request']
+        respondant=request.user if request.user.is_authenticated else None
+
+        response_instance=Response.objects.create(
+            form=form, 
+            respondant=respondant
+            )
+
+        answers_to_create=[]
+        for answer_data in validated_data.get('answers'):
+            question=Question.objects.get(question_id=answer_data['question_id'])
+            answers_to_create.append(
+                Answer(question=question,response=response_instance,value=answer_data['value'])
+            )
+        Answer.objects.bulk_create(answers_to_create)
+        return response_instance
+
+
+class AnswerResponseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Answer
+        fields=['value']
+
+    def to_representation(self, instance):
+        ret= super().to_representation(instance)
+
+        if instance.question.question_type==QuestionType.CHECKBOX:
+            try:
+                ret['value']=json.loads(ret['value'])
+            except:
+                ret['value']=[]
+
+        return ret
+    
+class QuestionWithAnswersSerializer(serializers.ModelSerializer):
+    options=OptionReadSerializer(many=True, required=False)
+    answers=AnswerResponseSerializer(many=True, read_only=True)
+
+    class Meta:
+        model=Question
+        fields=['question_id','question_type','text','description','is_required','order','options','answers']
+
+class FormWithResponseSerializer(serializers.ModelSerializer):
+    questions_with_answers=serializers.SerializerMethodField()
+
+    class Meta:
+        model=Form
+        fields=['form_id','title','description','questions_with_answers']
+
+    def get_questions_with_answers(self,instance):
+        result=[]
+        for question in instance.questions.all():
+            question_data={
+                "question_id":question.question_id,
+                "text":question.text,
+                "question_type":question.question_type,
+                "is_required":question.is_required,
+                "order":question.order,
+                "options":OptionReadSerializer(question.options.all(),many=True).data,
+                "answer":AnswerResponseSerializer(question.answers.all(),many=True).data
+            }
+            result.append(question_data)
+
+        return result
+    
+class ResponseListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Response
+        fields=['id','respondant','submitted_at']
