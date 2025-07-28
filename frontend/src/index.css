@@ -29,3 +29,14 @@ html.dragging-within-zone * {
 html.dragging-outside-zone * {
     cursor: not-allowed !important;
 }
+
+/* .email-input:focus::placeholder {
+  opacity: 0;
+}
+
+.email-input:focus + label,
+.email-input:valid + label {
+  top: -15px;
+  font-size: 18px;
+  color: blue;
+} */
