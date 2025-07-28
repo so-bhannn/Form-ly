@@ -1,0 +1,5 @@
+.box form .input_box input:focus + label,
+.box form .input_box input:valid + label{
+    top: -16px;
+    font-size: 12px;
+}
