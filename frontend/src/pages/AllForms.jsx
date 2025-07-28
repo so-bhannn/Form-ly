@@ -1,25 +1,19 @@
+import { useEffect } from "react";
 import { 
     FormCard,
     CustomSelect,
-    Button,
  } from "../components";
 import {
     DashboardLayout
 } from "../layouts"
-import { useState } from "react";
+import {useForms} from '../hooks'
 
 const AllForms = () => {
-    const [formDetails, setFormDetails] = useState([{ id: "",
-        title: "Form A",
-        description: `Lorem ipsum dolor sit amet,consectetur adipisicing elit. Dignissimos vitae commodi fugit in porro,assumenda adipisci repellat ea natus dicta voluptate tempora. Odit et saepe laborum ratione esse,eos facere!` ,
-        lastUpdated: "3",
-        responses: "15" },
-    { id: "", title: "Form Q", description: "", lastUpdated: "1", responses: 5 },
-    { id: "", title: "Form U", description: "", lastUpdated: "4", responses: 12 },
-    { id: "", title: "Form P", description: "", lastUpdated: "14", responses: 20 },
-    { id: "", title: "Form H", description: "", lastUpdated: "14", responses: 20 },
-    { id: "", title: "Form D", description: "", lastUpdated: "14", responses: 20 },
-    ])
+    const {forms, setForms, isLoading, error, fetchForms} = useForms()
+    
+    useEffect(()=>{
+        fetchForms()
+    },[fetchForms])
 
     const sortOptions = [
         { value: "recent", text: "Most Recent" },
@@ -28,54 +22,67 @@ const AllForms = () => {
     ];
 
     const handleSortChange = (value) => {
-        const setForm = [...formDetails].sort((a,b)=>{
+        const sortedForms = [...forms].sort((a,b)=>{
             if(value==='recent')
-                return a.lastUpdated-b.lastUpdated
+                return new Date(b.updated_at)- new Date(a.updated_at)
             else if(value==='responses')
                 return b.responses-a.responses
             else if(value==='alpha')
                 return a.title.localeCompare(b.title)
             return 0
         })
-        setFormDetails(setForm)
+        setForms(sortedForms)
     };
 
     return(
-        <DashboardLayout>
-            <div className="flex flex-wrap justify-between w-full pb-3.5">
-                <h1 className="text-4xl font-bold mb-2 md:mb-0">My Forms</h1>
-                <Button
-                    icon='bx bx-plus'
-                    content='Create Form'
-                />
-            </div>
-            <div className="w-full flex justify-between items-center mb-6">
-                <CustomSelect
-                    options={sortOptions}
-                    defaultValue={sortOptions[0]}
-                    onChange={handleSortChange}
-                    label="Sort by"
-                    icon='sort'
-                />
-            </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
-                {formDetails && (
-                    formDetails.map((formDetail, index)=>{
-                        return(
-                        <FormCard
-                            key={index}
-                            title={formDetail.title}
-                            description={formDetail.description}
-                            formID={formDetail.id}
-                            lastUpdated={formDetail.lastUpdated}
-                            responses={formDetail.responses}
-                        />
-                    )                
-                    })
-                )}
-            </div>
-
+        <DashboardLayout
+            pageName={'My Forms'}
+        >
+            {isLoading && (
+                <div>
+                    Loading...
+                </div>
+            )}
+            {!isLoading && (
+                <div className="w-full">
+                {forms && forms.length>0 && (
+                    <div>
+                        <div className="w-full flex justify-between items-center mb-6">
+                            <CustomSelect
+                                options={sortOptions}
+                                defaultValue={sortOptions[0]}
+                                onChange={handleSortChange}
+                                label="Sort by"
+                                icon='sort'
+                            />
+                        </div>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+                            {forms.map((formDetail)=>{
+                                return(
+                                <FormCard
+                                    key={formDetail.form_id}
+                                    title={formDetail.title}
+                                    description={formDetail.description}
+                                    accentColor={formDetail.accentColor}
+                                    formID={formDetail.form_id}
+                                    lastUpdated={formDetail.lastUpdated}
+                                    responses={formDetail.responses}
+                                />
+                                )
+                            })}
+                        </div>
+                    </div>)}
+                    {error && (
+                        <h1 className={'text-red-500'}>{error}</h1>
+                    )}
+                    {!error && (!forms || forms.length ===0) && (
+                        <div className="w-full">
+                            <h1 className="text-center text-md text-black/60 ">No Forms to view</h1>
+                        </div>
+                    )}
+                </div>
+                )
+            }
         </DashboardLayout>
     )
 }
