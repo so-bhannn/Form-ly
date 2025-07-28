@@ -21,7 +21,7 @@ const Home = ()=>{
         <Navbar/>
         </div>
         <div className='px-10 md:p-0'>
-            <div className="flex flex-wrap items-center lg:flex-nowrap md:px-10 px-0 py-5">
+            <div className="flex flex-wrap justify-self-center items-center w-3/4 lg:flex-nowrap md:px-10 px-0 py-5">
                 <div className='md:mr-10'>
                     <h1 className='text-5xl md:text-7xl font-bricolage font-bold'>Don't Make Excuses.</h1>
                     <h1 className='text-5xl md:text-7xl font-bricolage font-bold'>Make Beatiful Forms in minutes.</h1>
