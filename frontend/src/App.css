@@ -1,0 +1,7 @@
+.email-input::placeholder {
+  color: #6b7280; /* Default color */
+}
+
+.email-input:focus::placeholder {
+  color: transparent; /* Hide on focus */
+}
