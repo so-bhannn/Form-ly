@@ -12,18 +12,18 @@ export default function OptionList({
     return (
     <div>
         {options.map((option,index)=>(
-            <div key={option.id} className='flex items-center mb-2 gap-2'>
+            <div key={option.option_id} className='flex items-center mb-2 gap-2'>
                 {type==='MC' && <input type="radio" disabled></input>}
                 {type==='CB' && <input type="checkbox" disabled></input>}
                 {type==='DD' && <span>{`${index+1}.`}</span>}
                 <input
                     type="text"
-                    onChange={(e)=>updateOption(option.id, e.target.value)}
+                    onChange={(e)=>updateOption(option.option_id, e.target.value)}
                     value={option.text}
                     className="p-2 rounded-lg outline outline-gray-100 focus:outline-black/40"
                 />
                 <button
-                    onClick={()=>removeOption(option.id)}
+                    onClick={()=>removeOption(option.option_id)}
                     disabled={options.length===1}
                     className={`w-7 h-7 flex justify-center items-center rounded-lg ${options.length > 1 ? 'hover:bg-gray-100 cursor-pointer' : ''}`}
                 >
